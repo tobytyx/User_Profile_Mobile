@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+        #map{height: 100%;width:100%}
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=pBnPWrgXOz3sSp5R4xinB9c6Z0wvQ6Ra"></script>
+    <script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js"></script>
+	<title>带文字标签的覆盖物</title>
+</head>
+<body>
+    <div id="left" style="background-color: #EEEEEE;width: 50%;height: 100%;position: relative; float: left">
+        <div id="search" style="height: 10%;">
+            <form action="/display" method="get">
+                {% csrf_token %}
+                用户ID: <input type="text" name="id">
+                <input type="submit" value="查看">
+            </form>
+        </div>
+        <div id="display">
+            <div id="home"></div>
+            <div id="work"></div>
+            <div id="ent1"></div>
+            <div id="ent2"></div>
+            <div id="ent_way"></div>
+            <div id="work_prefer"></div>
+            <div id="trip_distance"></div>
+            <div id="trip_duration"></div>
+            <div id="trip_mode"></div>
+        </div>
+    </div>
+    <div id="map" style="width: 50%; height: 100%;position: relative; float: right"></div>
+</body>
+</html>
+<script type="text/javascript">
+	// 百度地图API功能
+	var map = new BMap.Map("map",{});
+    var point = new BMap.Point(116.404, 39.915);
+    map.centerAndZoom(point, 12); //设置中心点坐标以及地图级别
+    map.enableScrollWheelZoom();//启用滚轮放大缩小
+
+    // ent1_circle
+    var ent1 = {{ ent1|safe }};
+    if("lng" in ent1){
+        var ent1_center = new BMap.Point(ent1["lng"],ent1["lat"]);
+        var ent1_circle = new BMap.Circle(ent1_center, 300);
+        var marker_ent1 = new BMap.Marker(ent1_center);  // 创建标注
+        map.addOverlay(marker_ent1);
+        ent1_label = new BMap.Label("娱乐地",{offset:new BMap.Size(20,-10)});
+        ent1_label.setStyle({color:"green"});
+        marker_ent1.setLabel(ent1_label);
+        map.addOverlay(ent1_circle);
+    }
+
+    var ent2 = {{ ent2|safe }};
+    if("lng" in ent2){
+        var ent2_center = new BMap.Point(116.323,40.010);
+        var ent2_circle = new BMap.Circle(ent2_center, 300);
+        var marker_ent2 = new BMap.Marker(ent2_center);  // 创建标注
+        map.addOverlay(marker_ent2);
+        ent2_label = new BMap.Label("娱乐地",{offset:new BMap.Size(20,-10)});
+        ent2_label.setStyle({color:"green"});
+        marker_ent2.setLabel(ent2_label);
+        map.addOverlay(ent2_circle);
+    }
+
+	var home = {{ home|safe }};
+    if ("lng" in home){
+        var home_center = new BMap.Point(116.31,40.00);
+        var home_circle = new BMap.Circle(home_center, 300);
+        var marker_home = new BMap.Marker(home_center);  // 创建标注
+        map.addOverlay(marker_home);
+        home_label = new BMap.Label("居住地",{offset:new BMap.Size(20,-10)});
+        home_label.setStyle({color:"blue"});
+        marker_home.setLabel(home_label);
+        map.addOverlay(home_circle);
+    }
+
+    var work = {{ work|safe }};
+    if("lng" in work){
+        var work_center = new BMap.Point(116.327,40.000);
+        var work_circle = new BMap.Circle(work_center, 300);
+        var marker_work = new BMap.Marker(work_center);  // 创建标注
+        map.addOverlay(marker_work);
+        work_label = new BMap.Label("工作地",{offset:new BMap.Size(20,-10)});
+        work_label.setStyle({color:"red"});
+        marker_work.setLabel(work_label);
+        map.addOverlay(work_circle);
+    }
+
+    if("name" in home){
+        var home_txt = "<p>居住地: "+home["name"]+ "</p>";
+        $("#home").append(home_txt)
+    }
+    if("name" in work){
+        var work_txt = "<p>工作地: "+work["name"]+ "</p>";
+        $("#work").append(work_txt)
+    }
+    if("name" in ent1){
+        var ent1_txt = "<p>活动地: "+ent1["name"]+ "</p>";
+        $("#ent1").append(ent1_txt)
+    }
+    if("name" in ent2){
+        var ent2_txt = "<p>活动地: "+ent2["name"]+ "</p>";
+        $("#ent2").append(ent2_txt)
+    }
+    var ent_way = "{{ ent_way|safe }}";
+    if(ent_way != "default"){
+        $("#ent_way").append("<p>娱乐方式偏好："+ent_way+"</p>")
+    }
+
+    var work_prefer = "{{ work_prefer|safe }}";
+    if(work_prefer != "default"){
+        $("#work_prefer").append("<p>工作状态："+work_prefer+"</p>")
+    }
+    var trip_distance = "{{ trip_distance|safe }}";
+    $("#trip_distance").append("<p>出行距离偏好："+trip_distance+"</p>")
+    var trip_duration = "{{ trip_duration|safe }}";
+    $("#trip_duration").append("<p>出行时间偏好："+trip_duration+"</p>")
+    var trip_mode = "{{ trip_mode|safe }}";
+    $("#trip_mode").append("<p>出行方式偏好："+trip_mode+"</p>")
+
+</script>

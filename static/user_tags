@@ -1,0 +1,36 @@
+家1
+    （分级+标签）
+工作地1
+    （分级+标签）
+娱乐地1
+    （分级+标签）
+收入水平
+    高 "high-level"
+    中 "medium-level"
+    低 "short-level"
+
+工作偏好
+    在家工作 "home_based"
+    工作狂 "workaholic"
+    朝九晚五型 "nine-to-five"
+
+娱乐偏好1
+    宅 "otaku"
+    购物族 "shopper"
+    亲近自然 "nature"
+
+出行偏好1
+    距离1
+        长 "long"
+        中 "medium"
+        短 "short"
+    时间1
+        长 "long"
+        中 "medium"
+        短 "short"
+    方式1
+        汽车 "driving"
+        公共交通 "transit"
+        自行车 "riding"
+        步行 "walking"
+
