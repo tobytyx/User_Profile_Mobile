@@ -3,7 +3,6 @@ from .tools import get_distance, get_possible_modes, use_baidu_api
 from .config import opt
 from .public_classes import Path
 import os
-import sys
 import datetime
 import json
 

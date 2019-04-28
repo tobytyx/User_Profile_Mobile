@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 from .tools import get_distance
 from .config import opt
-from .public_classes import estate_price
 import datetime
 
 
 class UserProfile(object):
 
-    def __init__(self, user_feature, price_level):
+    def __init__(self, user_feature, price_level, estate_price):
         # ********出行习惯**********
         self._weekday_trip_distance_prefer = user_feature.weekday_trip_distance_prefer  # long/medium/short
         self._weekday_trip_duration_prefer = user_feature.weekday_trip_duration_prefer  # long/medium/short
@@ -30,7 +29,7 @@ class UserProfile(object):
 
         # ********家庭收入水平**********
         self.income_level = "default"
-        self.get_income_level(price_level)
+        self.get_income_level(price_level, estate_price)
 
         # ********生活风格**********
         self.work_prefer = self.get_work_prefer()
@@ -44,7 +43,7 @@ class UserProfile(object):
         self.trip_mode = "default"
         self.get_commuting_status()
 
-    def get_income_level(self, price_level):
+    def get_income_level(self, price_level, estate_price):
         if "name" in self.home_area:
             if "房地产" not in self.home_area["tags"]:
                 return
@@ -55,7 +54,8 @@ class UserProfile(object):
                 self.income_level = "high"
             elif house_price < price_level["low"]:
                 self.income_level = "low"
-            self.income_level = "medium"
+            else:
+                self.income_level = "medium"
 
     def get_work_prefer(self):
         if "lat" in self.work_area and "lat" in self.home_area:

@@ -113,7 +113,8 @@ class BasicFeatureExtraction(object):
             "end_time": end_time,
             "total_duration": total_duration,
             "total_distance": total_distance,
-            "average_speed": average_speed
+            "average_speed": average_speed,
+            "mode": trip_data[0][4]
         }
 
     def total_trip_mining(self):
@@ -127,11 +128,19 @@ class BasicFeatureExtraction(object):
         for trip in self.weekday_trip_data_feature:
             total_distance += trip["total_distance"]
             total_duration += trip["total_duration"]
-            possible_modes = get_possible_modes(
-                prob_dis=trip["total_distance"],
-                prob_speed=trip["average_speed"])
-            for i, possible_mode in enumerate(possible_modes):
-                trip_modes[possible_mode] += mode_scores[i]
+            if trip["mode"] != "default":
+                if trip["mode"] in ("walk", "run"):
+                    trip_modes["walking"] += 1
+                elif trip["mode"] in ("bike"):
+                    trip_modes["riding"] += 1
+                elif trip["mode"] in ("bus", "subway", "train"):
+                    trip_modes["driving"] += 1
+                elif trip["mode"] in ("motorcycle", "car"):
+                    trip_modes["transit"] += 1
+            else:
+                possible_modes = get_possible_modes(prob_dis=trip["total_distance"], prob_speed=trip["average_speed"])
+                for i, possible_mode in enumerate(possible_modes):
+                    trip_modes[possible_mode] += mode_scores[i]
             total_times += 1
         self.weekday_ave_trip_times = total_times
         if total_times == 0:
@@ -152,11 +161,19 @@ class BasicFeatureExtraction(object):
         for trip in self.weekend_trip_data_feature:
             total_distance += trip["total_distance"]
             total_duration += trip["total_duration"]
-            possible_modes = get_possible_modes(
-                prob_dis=trip["total_distance"],
-                prob_speed=trip["average_speed"])
-            for i, possible_mode in enumerate(possible_modes):
-                trip_modes[possible_mode] += mode_scores[i]
+            if trip["mode"] != "default":
+                if trip["mode"] in ("walk", "run"):
+                    trip_modes["walking"] += 1
+                elif trip["mode"] in ("bike"):
+                    trip_modes["riding"] += 1
+                elif trip["mode"] in ("bus", "subway", "train"):
+                    trip_modes["driving"] += 1
+                elif trip["mode"] in ("motorcycle", "car"):
+                    trip_modes["transit"] += 1
+            else:
+                possible_modes = get_possible_modes(prob_dis=trip["total_distance"], prob_speed=trip["average_speed"])
+                for i, possible_mode in enumerate(possible_modes):
+                    trip_modes[possible_mode] += mode_scores[i]
             total_times += 1
         if total_times == 0:
             self.weekend_ave_distance = 0

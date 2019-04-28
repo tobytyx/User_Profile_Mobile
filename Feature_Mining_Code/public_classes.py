@@ -173,6 +173,3 @@ class Step(object):
     def show_path(self):
         print('mode: %s, total_time: %d, distance: %s, origin: (%f,%f), dest: (%f,%f)'
               % (self.mode, self.total_time, self.distance, self.origin['lat'], self.origin['lng'], self.destination['lat'], self.destination['lng']))
-
-
-estate_price = EstatePrice()

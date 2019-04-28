@@ -4,6 +4,9 @@ import Feature_Mining_Code
 from Feature_Mining_Code.tools import gaussian_distribute
 import argparse
 from Feature_Mining_Code import opt
+import pickle
+import os
+import json
 
 
 def main():
@@ -11,39 +14,39 @@ def main():
     print("initializing...")
     data_clean = Feature_Mining_Code.DataClean()
     data_division = Feature_Mining_Code.TrajDivision()
-    estate_price = Feature_Mining_Code.estate_price
+    estate_price = Feature_Mining_Code.EstatePrice()
     user_names = data_clean.users
     users = {}
     for user_name in user_names:
         users[user_name] = Feature_Mining_Code.User(name=user_name)
-    if load_feature == 1:
-        print("loading user feature...")
-        prices = []
-        for user_name in user_names:
-            users[user_name].load_user_feature(feature_dir=opt.features_dir)
-            # {"lat","lng","province",city",district",street","name",tag","uid"}
-            home = users[user_name].user_feature_extraction.home_area
-            if "name" in home:
-                price = estate_price.name2price(home["name"])
-                if price is not None:
-                    prices.append(price)
-    else:
-        if pre_make == 1:
-            print("data cleaning...")
-            # 1、data_cleaning
-            # 2、data_process_dpi / division
-            data_clean.clean_gps_data()
-            print("data dividing...")
-            data_division.data_division(user_names)
 
-        weekday_durations = []
-        weekend_durations = []
-        weekday_distances = []
-        weekend_distances = []
+    if loading_pre == 0:
+        print("data cleaning...")
+        # 1、data_cleaning
+        # 2、data_process_dpi / division
+        data_clean.clean_gps_data()
+        print("data dividing...")
+        data_division.data_division(user_names)
+
+    if loading_basic == 0:
         # 3、basic_feature_extraction
         print("basic feature extracting...")
         for user_name in user_names:
             users[user_name].set_basic_feature_extraction()
+            users[user_name].basic_feature_extraction.save()
+    else:
+        print("loading basic feature...")
+        for user_name in user_names:
+            users[user_name].load_basic_feature(opt.basic_feature_dir)
+
+    if loading_feature == 0:
+        # 5、user_feature_extraction
+        print("user feature extracting...")
+        weekday_durations = []
+        weekend_durations = []
+        weekday_distances = []
+        weekend_distances = []
+        for user_name in user_names:
             weekday_distances.append(users[user_name].basic_feature_extraction.weekday_ave_distance)
             weekend_distances.append(users[user_name].basic_feature_extraction.weekend_ave_distance)
             weekday_durations.append(users[user_name].basic_feature_extraction.weekday_ave_duration)
@@ -64,20 +67,22 @@ def main():
             "weekend_duration_short": weekend_duration_short,
             "weekend_duration_long": weekend_duration_long
         }
-        # 5、user_feature_extraction
-        print("user feature extracting...")
-        prices = []
         for user_name in user_names:
             users[user_name].set_user_feature_extraction(level_std=level_std)
             users[user_name].user_feature_extraction.save()
-            # {"lat","lng","province",city",district",street","name",tag","uid"}
-            home = users[user_name].user_feature_extraction.home_area
-            if "name" in home:
-                price = estate_price.name2price(home["name"])
-                if price is not None:
-                    prices.append(price)
+    else:
+        print("loading user feature...")
+        for user_name in user_names:
+            users[user_name].load_user_feature(feature_dir=opt.features_dir)
 
     # 6、从所有数据中根据房屋数据提取低收入、高收入分界线
+    prices = []
+    for user_name in user_names:
+        home = users[user_name].user_feature_extraction.home_area
+        if "name" in home:
+            price = estate_price.name2price(home["name"])
+            if price is not None:
+                prices.append(price)
     low_level, high_level = gaussian_distribute(prices)
     price_level = {
         "high": high_level,
@@ -87,18 +92,27 @@ def main():
     # 7、user_profile
     print("user profiling")
     for user_name in user_names:
-        users[user_name].set_user_profile(price_level=price_level)
+        users[user_name].set_user_profile(price_level=price_level, estate_price=estate_price)
         users[user_name].save_profile(file_dir=opt.profile_dir)
+
+    users_pkl = {}
+    files = os.listdir(opt.profile_dir)
+    for profile in files:
+        with open(os.path.join(opt.profile_dir, profile), mode="r", encoding="utf-8") as f:
+            users_pkl[profile[:3]] = json.loads(f.read())
+
+    with open(opt.profile_pkl_path, mode="wb") as f:
+        f.write(pickle.dumps(users_pkl))
 
 
 if __name__ == "__main__":
-    sys.path.append("/home/tanyx/WorkSpace/PyProjects/User_Profile-Mobile")
+    sys.path.append(opt.project_root)
     parser = argparse.ArgumentParser(description="choose to premake or not")
-    parser.add_argument('-1', '--premake', type=int, help="1 for premake, 0 for not", default=0)
+    parser.add_argument('-1', '--pre', type=int, help="1 for loading premake, 0 for not", default=1)
     parser.add_argument('-2', '--basic', type=int, help="1 for loading basic feature, 0 for not", default=1)
     parser.add_argument('-3', '--feature', type=int, help="1 for loading feature, 0 for not", default=1)
     args = parser.parse_args()
-    pre_make = args.premake
-    basic_feature = args.basic
-    load_feature = args.feature
+    loading_pre = args.pre
+    loading_basic = args.basic
+    loading_feature = args.feature
     main()

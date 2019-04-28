@@ -26,11 +26,12 @@ class User(object):
                 level_std=level_std
             )
 
-    def set_user_profile(self, price_level):
+    def set_user_profile(self, price_level, estate_price):
         if self.user_profile is None and self.user_feature_extraction is not None:
             self.user_profile = UserProfile(
                 user_feature=self.user_feature_extraction,
-                price_level=price_level
+                price_level=price_level,
+                estate_price=estate_price
             )
             self.profile = {
                 "home_area": self.user_profile.home_area,

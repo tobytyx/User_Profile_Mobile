@@ -23,6 +23,7 @@ class Config(object):
     features_dir = os.path.join(data_root, r"user_feature")
     # path profile
     profile_dir = os.path.join(data_root, r"profile")
+    profile_pkl_path = os.path.join(project_root, r"User_Profile_Mobile/users.pkl")
     # path other
     house_price_filename = os.path.join(project_root, r"static/beijing.csv")
 

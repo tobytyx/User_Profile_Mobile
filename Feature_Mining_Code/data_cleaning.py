@@ -16,6 +16,7 @@ class DataClean(object):
         self.sub_dir = opt.clean_data_sub_dir
         self.label_name = opt.clean_data_label
         self.des_dir = opt.clean_data_dir  # 目标记录所在地
+        self.t = datetime.timedelta(hours=8)
         if not os.path.exists(self.des_dir):
             os.mkdir(self.des_dir)
 
@@ -68,7 +69,7 @@ class DataClean(object):
                                 break
                         user_records.append([
                             user, longitude, latitude,
-                            record_time.strftime("%Y-%m-%d %H:%M:%S"),
+                            self.change_time(record_time).strftime("%Y-%m-%d %H:%M:%S"),
                             record_mode
                         ])
             # 一个人的记录全部结束后再写入
@@ -77,6 +78,10 @@ class DataClean(object):
                     encoding="utf8",
                     mode='w') as f:
                 f.write(json.dumps({'data': user_records}))
+
+    # 转换为北京时间
+    def change_time(self, raw_time):
+        return raw_time + self.t
 
 # 分用户， 提取关键字段
     @classmethod

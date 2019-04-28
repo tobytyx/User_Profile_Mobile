@@ -41,13 +41,16 @@ def display(request):
                 ent2["name"] = user["ent_area"][1]["city"] + user["ent_area"][1]["district"] + user["ent_area"][1]["street"] + user["ent_area"][1]["name"]
         ent_way = user["ent_way"]
         work_prefer = user["work_prefer"]
+        income_level = user["income_level"]
         trip_distance = user["trip_distance"]
         trip_duration = user["trip_duration"]
         trip_mode = user["trip_mode"]
+        params["user_name"] = user_name
         params["home"] = home
         params["work"] = work
         params["ent1"] = ent1
         params["ent2"] = ent2
+        params["income_level"] = income_level
         params["ent_way"] = ent_way
         params["work_prefer"] = work_prefer
         params["trip_distance"] = trip_distance

@@ -7,4 +7,4 @@ from .user import User
 from .user_feature_extraction import UserFeatureExtraction
 from .user_profiling import UserProfile
 from .user import User
-from .public_classes import estate_price
+from .public_classes import EstatePrice

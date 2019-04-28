@@ -262,7 +262,7 @@ class UserFeatureExtraction(object):
         for trip in self._weekday_trip_data_feature:
             if opt.attendance_time_begin < trip["start_time"].time() < opt.attendance_time_end and True:
                 attendance_time_list.append(trip["start_time"].time())
-            if opt.quitting_time_begin < trip["start_time"].time() < opt.attendance_time_end and True:
+            if opt.quitting_time_begin < trip["start_time"].time() < opt.quitting_time_end and True:
                 quit_time_list.append(trip["start_time"].time())
 
         avg_attendance_time = 0
